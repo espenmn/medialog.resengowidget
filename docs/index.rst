@@ -1,0 +1,5 @@
+======================
+medialog.resengowidget
+======================
+
+User documentation
