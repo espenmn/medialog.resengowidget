@@ -17,43 +17,50 @@ import six.moves.urllib.request, six.moves.urllib.error, six.moves.urllib.parse
 
 
 class IResengoPortlet(IPortletDataProvider):
-    place_str = schema.TextLine(
-        title=_(u'Name of your place with country code'),
-        description=_(u'City name along with country code i.e Delhi,IN'),  # NOQA: E501
+    language = schema.TextLine(
+        title=_(u'Country code'),
+        description=_(u'NL'),  # NOQA: E501
         required=True,
-        default=u'delhi,in'
+        default=u'NL'
     )
+
+    companyId = schema.Int(
+        title=_(u'Country code'),
+        description=_(u'Resengo customer id'),  # NOQA: E501
+        required=True,
+        default=1755231
+    )
+
+
 
 
 @implementer(IResengoPortlet)
 class Assignment(base.Assignment):
     schema = IResengoPortlet
 
-    def __init__(self, place_str='delhi,in'):
-        self.place_str = place_str.lower()
-
-    @property
-    def title(self):
-        return _(u'Weather of the place')
+    def __init__(self, language='NL', companyId=1755231):
+        self.language = language
+        self.companyId = companyId
 
 
 class AddForm(base.AddForm):
     schema = IResengoPortlet
     form_fields = field.Fields(IResengoPortlet)
-    label = _(u'Add Place weather')
-    description = _(u'This portlet displays weather of the place.')
+    label = _(u'Add Resengo widget')
+    description = _(u'This portlet displays Resengo widget')
 
     def create(self, data):
         return Assignment(
-            place_str=data.get('place_str', 'delhi,in'),
+            language=data.get('language', 'NL'),
+            companyId=data.get('companyId ', 1755231),
         )
 
 
 class EditForm(base.EditForm):
     schema = IResengoPortlet
     form_fields = field.Fields(IResengoPortlet)
-    label = _(u'Edit Place weather')
-    description = _(u'This portlet displays weather of the place.')
+    label = _(u'Edit Reengo widget')
+    description = _(u'This portlet displays Resengo widget.')
 
 
 class Renderer(base.Renderer):
@@ -63,44 +70,24 @@ class Renderer(base.Renderer):
     def __init__(self, *args):
         base.Renderer.__init__(self, *args)
         context = aq_inner(self.context)
-        portal_state = getMultiAdapter(
-            (context, self.request),
-            name=u'plone_portal_state'
-        )
-        self.anonymous = portal_state.anonymous()
 
     def render(self):
         return self._template()
 
-    @property
-    def available(self):
-        """Show the portlet only if there are one or more elements and
-        not an anonymous user."""
-        return not self.anonymous and self._data()
+    #@property
+    #def available(self):
+    #    """Show the portlet only if there are elements and
+    #    not an anonymous user."""
+    #    return self._data()
 
-    def weather_report(self):
-        self.result = self._data()
-        return self.result['description']
 
-    def get_humidity(self):
-        return self.result['humidity']
-
-    def get_pressure(self):
-        return self.result['pressure']
 
     @memoize
-    def _data(self):
-        baseurl = 'https://query.yahooapis.com/v1/public/yql?'
-        yql_query = 'select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="{0}")'.format(  # NOQA: E501
-            self.data.place_str,
+    def data(self):
+        jscript  = """
+        (function(){var k=function(a,c,d,b){if(a.getElementById(d)){if(b){var e=100;var f=function(){setTimeout(function(){e--;if(window.RESENGO_WIDGET_SCRIPT_LOADED)b();else if(0<e)f();else throw Error("resengo script failed to load");},100)};f()}}else{var g=a.getElementsByTagName(c)[0];a=a.createElement(c);a.id=d;a.src="https://static.resengo.com/ResengoWidget";b&&(a.onload=b);g.parentNode.insertBefore(a,g)}},h=function(){return k(document,"script","resengo-flow-widget-script",function(){RESENGO_WIDGET({companyId:"{0}",language:"{1}"})})};window.attachEvent?window.attachEvent("onload",h):window.addEventListener("load",h,!1)})();
+        """.format(
+            self.data.language, seld.data.companyId
         )
-        yql_url = baseurl + six.moves.urllib.parse.urlencode(
-            {'q': yql_query},
-        ) + '&format=json'
-        result = six.moves.urllib.request.urlopen(yql_url).read()
-        data = json.loads(result)
-        result = {}
-        result['description'] = data['query']['results']['channel']['description']  # NOQA: E501
-        result['pressure'] = data['query']['results']['channel']['atmosphere']['pressure']  # NOQA: E501
-        result['humidity'] = data['query']['results']['channel']['atmosphere']['humidity']  # NOQA: E501
-        return result
+
+        return jscript
