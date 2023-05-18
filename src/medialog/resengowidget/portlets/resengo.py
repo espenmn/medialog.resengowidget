@@ -73,21 +73,21 @@ class Renderer(base.Renderer):
 
     def render(self):
         return self._template()
+        #return self.jscript()
 
     #@property
     #def available(self):
-    #    """Show the portlet only if there are elements and
-    #    not an anonymous user."""
+    #    '''Show the portlet only if there are elements and
+    #    not an anonymous user.'''
     #    return self._data()
 
 
 
-    @memoize
-    def data(self):
-        jscript  = """
-        (function(){var k=function(a,c,d,b){if(a.getElementById(d)){if(b){var e=100;var f=function(){setTimeout(function(){e--;if(window.RESENGO_WIDGET_SCRIPT_LOADED)b();else if(0<e)f();else throw Error("resengo script failed to load");},100)};f()}}else{var g=a.getElementsByTagName(c)[0];a=a.createElement(c);a.id=d;a.src="https://static.resengo.com/ResengoWidget";b&&(a.onload=b);g.parentNode.insertBefore(a,g)}},h=function(){return k(document,"script","resengo-flow-widget-script",function(){RESENGO_WIDGET({companyId:"{0}",language:"{1}"})})};window.attachEvent?window.attachEvent("onload",h):window.addEventListener("load",h,!1)})();
-        """.format(
-            self.data.language, seld.data.companyId
-        )
+    #@memoize
+    def jscript(self):
+        #jscript =  '(function(){var k=function(a,c,d,b){if(a.getElementById(d)){if(b){var e=100;var f=function(){setTimeout(function(){e--;if(window.RESENGO_WIDGET_SCRIPT_LOADED)b();else if(0<e)f();else throw Error('resengo script failed to load');},100)};f()}}else{var g=a.getElementsByTagName(c)[0];a=a.createElement(c);a.id=d;a.src='https://static.resengo.com/ResengoWidget';b&&(a.onload=b);g.parentNode.insertBefore(a,g)}},h=function(){return #k(document,'script','resengo-flow-widget-script',function(){RESENGO_WIDGET({companyId:'{}',language:'{}}'})})};window.attachEvent?window.attachEvent('onload',h):window.addEventListener('load',h,!1)})();'''.format(
+        #     self.data.companyId, self.data.language,
+        #)
+        jscript =  """(function(){var k=function(a,c,d,b){if(a.getElementById(d)){if(b){var e=100;var f=function(){setTimeout(function(){e--;if(window.RESENGO_WIDGET_SCRIPT_LOADED)b();else if(0<e)f();else throw Error('resengo script failed to load');},100)};f()}}else{var g=a.getElementsByTagName(c)[0];a=a.createElement(c);a.id=d;a.src='https://static.resengo.com/ResengoWidget';b&&(a.onload=b);g.parentNode.insertBefore(a,g)}},h=function(){return k(document,'script','resengo-flow-widget-script',function(){RESENGO_WIDGET({companyId:'""" +  str(self.data.companyId) + """',language:'""" + self.data.language + """'})})};window.attachEvent?window.attachEvent('onload',h):window.addEventListener('load',h,!1)})()"""
 
         return jscript

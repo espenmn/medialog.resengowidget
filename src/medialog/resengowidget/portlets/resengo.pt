@@ -1,5 +1,4 @@
-<div class="Resengog">
-<script type="text/javascript">
-  ${view/data}
+<div class="Resengo">
+<script type="text/javascript" tal:content="structure view/jscript">
 </script>
 </div>
