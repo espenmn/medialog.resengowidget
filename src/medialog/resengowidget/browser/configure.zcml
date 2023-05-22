@@ -18,4 +18,8 @@
       directory="static"
       />
 
+  <browser:resourceDirectory
+  name="medialog.resengowidgete"
+  directory="resources" />
+
 </configure>

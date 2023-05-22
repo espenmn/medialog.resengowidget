@@ -1,0 +1,4 @@
+<div class="Resengo">
+<script type="text/javascript" tal:content="structure view/jscript">
+</script>
+</div>

@@ -1,4 +1,19 @@
-<div class="Resengo">
-<script type="text/javascript" tal:content="structure view/jscript">
-</script>
-</div>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+
+
+  <div class="Resengo">
+  </div>
+
+
+  <script>
+            require([
+            '++resource++medialog.resengowidgete/resengoe',
+            ], function($) {
+              
+          });
+  </script>
+
+</body>
+</html>
